@@ -1,0 +1,24 @@
+module servidorNotificaciones{
+    module sop_corba{
+        interface Notificaciones{
+            struct IndicadoresDTO{
+                int frecuenciaCardiaca;
+                int frecuenciaRespiratoria;
+                float temperatura;
+            }
+
+            struct AlertaDTO{
+                IndicadoresDTO indicadores;
+                Date fechaHora;
+                int puntuacion;
+            }
+
+            struct historialAlertasDTO{
+                AlertaDTO alertas[6];
+                PacienteDTO objPaciente;
+            }
+
+            void enviarAlerta(in HistorialAlertasDTO objHistorial)
+        };
+    };
+};

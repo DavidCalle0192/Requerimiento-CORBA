@@ -1,0 +1,7 @@
+module cliente{
+    module sop_corba{
+        interface Paciente{
+            alertarPaciente(string mensaje);
+        };
+    };
+};
