@@ -138,8 +138,7 @@ public class ServidorDeObjetos extends javax.swing.JFrame {
             
             System.out.println("4. Crea el objeto servant");
             
-            VistaLogAlertas guiAlertas = new VistaLogAlertas();
-            GestionPacienteImpl ObjServant = new GestionPacienteImpl(guiAlertas);
+            GestionPacienteImpl ObjServant = new GestionPacienteImpl();
             
             System.out.println("5. Crea el objeto tie y se registra una referencia al objeto servant mediante el contructor");
             GestionPacientesPOATie objTIE= new GestionPacientesPOATie(ObjServant);
