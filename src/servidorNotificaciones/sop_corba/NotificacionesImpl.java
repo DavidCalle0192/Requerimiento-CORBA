@@ -7,20 +7,26 @@
 package servidorNotificaciones.sop_corba;
 
 import servidorAlertas.dto.HistorialAlertasDTO;
+import servidorNotificaciones.vista.VistaNotificaciones;
 
 /**
  *
  * @author JhonMZ
  */
 public class NotificacionesImpl implements NotificacionesOperations{
-
-    public NotificacionesImpl() {
+    
+    VistaNotificaciones guiNotificaciones;
+    
+    public NotificacionesImpl(VistaNotificaciones guiNotificaciones) {
+        this.guiNotificaciones = guiNotificaciones;
     }
 
     
     @Override
     public void enviarAlerta(HistorialAlertasDTO objHistorial) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        //guiNotificaciones.editarInfo(objHistorial);
+        System.out.println("Hola");
+        guiNotificaciones.setVisible(true);
     }
     
 }

@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package servidorNotificaciones.vista;
+package servidorAlertas;
 
 import org.omg.CORBA.ORB;
 import org.omg.CosNaming.NameComponent;
@@ -12,9 +12,11 @@ import org.omg.CosNaming.NamingContextExt;
 import org.omg.CosNaming.NamingContextExtHelper;
 import org.omg.PortableServer.POA;
 import org.omg.PortableServer.POAHelper;
-import servidorNotificaciones.sop_corba.Notificaciones;
-import servidorNotificaciones.sop_corba.NotificacionesImpl;
-import servidorNotificaciones.sop_corba.NotificacionesPOATie;
+import servidorAlertas.sop_corba.GestionPacienteImpl;
+import servidorAlertas.sop_corba.GestionPacientes;
+import servidorAlertas.sop_corba.GestionPacientesPOATie;
+import servidorAlertas.vista.VistaLogAlertas;
+import servidorNotificaciones.*;
 
 /**
  *
@@ -69,7 +71,6 @@ public class ServidorDeObjetos extends javax.swing.JFrame {
             }
         });
 
-        TextField_puerto.setText("2020");
         TextField_puerto.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -136,13 +137,15 @@ public class ServidorDeObjetos extends javax.swing.JFrame {
             rootPOA.the_POAManager().activate();
             
             System.out.println("4. Crea el objeto servant");
-            NotificacionesImpl ObjServant = new NotificacionesImpl();
+            
+            VistaLogAlertas guiAlertas = new VistaLogAlertas();
+            GestionPacienteImpl ObjServant = new GestionPacienteImpl(guiAlertas);
             
             System.out.println("5. Crea el objeto tie y se registra una referencia al objeto servant mediante el contructor");
-            NotificacionesPOATie objTIE= new NotificacionesPOATie(ObjServant);
+            GestionPacientesPOATie objTIE= new GestionPacientesPOATie(ObjServant);
             
             System.out.println("6. Obtiene la referencia al orb ");
-            Notificaciones referenciaORB = objTIE._this(orb);
+            GestionPacientes referenciaORB = objTIE._this(orb);
             
             System.out.println("7. Obtiene una referencia al n_s del orb");
             org.omg.CORBA.Object objRefNameService = orb.resolve_initial_references("NameService");
@@ -151,12 +154,16 @@ public class ServidorDeObjetos extends javax.swing.JFrame {
             NamingContextExt refContextoNombrado = NamingContextExtHelper.narrow(objRefNameService);
             
             System.out.println("9.Construir el identificador del servant");
-            String name = "objNotificaciones";
+            String name = "objAlertas";
             NameComponent path[] = refContextoNombrado.to_name( name );
 
             System.out.println("10.Realiza el binding de la referencia de objeto en el N_S");
             refContextoNombrado.rebind(path, referenciaORB);
-
+            this.setVisible(false);
+            
+            System.out.println("Consultando referencia remota...");
+            ObjServant.consultarReferenciaRemota(refContextoNombrado, "objNotificaciones");
+        
             System.out.println("El Servidor esta listo y esperando ...");
             orb.run();
         }catch (Exception e){
