@@ -5,6 +5,7 @@
  */
 package cliente.vistas;
 
+import cliente.ClienteDeObjetos;
 import java.rmi.RemoteException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,7 +18,7 @@ import servidorAlertas.sop_corba.GestionPacientes;
  */
 public class vista1_administrador extends javax.swing.JFrame {
 
-    public static GestionPacientes ref;
+    public static ClienteDeObjetos co;
 
     /**
      * Creates new form IniciarSesion
@@ -27,8 +28,8 @@ public class vista1_administrador extends javax.swing.JFrame {
         initComponents();
     }
 
-    public vista1_administrador(GestionPacientes objRemoto) {
-        this.ref = objRemoto;
+    public vista1_administrador(ClienteDeObjetos co) {
+        this.co = co;
         initComponents();
     }
 
@@ -118,11 +119,11 @@ public class vista1_administrador extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(null, "El valor debe ser entre 1 y 5");
                     txf_numMaxReg.setText("");
                 } else {
-                    this.setVisible(false);
                     //this.dispose();
-                    ref.establecerMaxPacientes(cantRegistros);
-                    //MenuMedico ma=new MenuMedico(ref);
-                    //ma.setVisible(true);
+                    co.retornarObjGestionPaciente().establecerMaxPacientes(cantRegistros);
+                    MenuMedico ma=new MenuMedico(co);
+                    ma.definirRol();
+                    ma.setVisible(true);
                     this.setVisible(false);
                     //Vista2_administrador vista2 = new Vista2_administrador(objRemoto);
                     //vista2.cargarInformacion();//validar numero
