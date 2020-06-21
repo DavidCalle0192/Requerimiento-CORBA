@@ -164,7 +164,7 @@ public class ServidorDeObjetos extends javax.swing.JFrame {
             ObjServant.consultarReferenciaRemota(refContextoNombrado, "objNotificaciones");
         
             System.out.println("El Servidor esta listo y esperando ...");
-            orb.run();
+            //orb.run();
         }catch (Exception e){
             
         }

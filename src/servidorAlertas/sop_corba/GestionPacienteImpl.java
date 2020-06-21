@@ -28,29 +28,50 @@ public class GestionPacienteImpl implements GestionPacientesOperations {
     private VistaLogAlertas guiAlertas;
     private Notificaciones objRefRemotaNotificaciones;
     private Hashtable<Integer, Pair<PacienteDTO,Paciente>> objRegistros;
-    private int MAX_PACIENTES = 1;
+    private int MAX_PACIENTES = -1;
     PacienteDAO objPacienteDAO;
     
     public GestionPacienteImpl() {
         objRegistros = new Hashtable<>();
-        guiAlertas = new VistaLogAlertas();
-        guiAlertas.setVisible(true);
         objPacienteDAO = new PacienteDAO();
+        this.guiAlertas = new VistaLogAlertas();
+        guiAlertas.setVisible(true);
+
     }
     
+    /**
+     * Registra un paciente en la base de datos, si el paciente ya esta registrado 
+     * actualiza sus datos
+     * @param objPaciente Objeto que contiene los datos del paciente
+     * @param refCliente Servant del paciente 
+     * @param resultado parametro de salida donde se retorna un mensaje del registro
+     * @return Retorna true si el registro o actualizacion es exitoso
+     */
     @Override
     public boolean registrarPaciente(PacienteDTO objPaciente, Paciente refCliente, StringHolder resultado) {
-        log("\nEjecutando registrarPaciente...");
+        log("Ejecutando registrarPaciente...");
         boolean res = false;
+        resultado.value = "";
         if(objRegistros.size() < MAX_PACIENTES){
             if(!pacienteActivo(objPaciente)){
                 if(!pacienteRegistrado(objPaciente)){
                     res = objPacienteDAO.registrarPaciente(objPaciente);
-                    refCliente.alertarPaciente("Hola");
+                    resultado.value = "registrado";
                 }else{
-                    resultado.value = "Paciente_registrado";
-                    log("El paciente con id "+objPaciente.id+" ya esta registrado se procedera actualizar sus datos");
-                    //TODO actualizar
+                    resultado.value = "actualizado";
+                    log("El paciente con id "+objPaciente.id+" ya esta registrado se procedera actualizar sus datos");//TODO actualizar
+                    res = actualizarPaciente(objPaciente);
+                }
+                if(res==true){
+                    objRegistros.put(objPaciente.id, new Pair<PacienteDTO,Paciente>(objPaciente,refCliente));
+                    log("Paciente nuevo:");
+                    log("Nombre:"+objPaciente.nombres+" "+objPaciente.apellidos);
+                    log("Identificacion: "+objPaciente.tipo_id+" "+objPaciente.id);
+                    log("Direccion:"+objPaciente.direccion);
+                    //refCliente.alertarPaciente("Hola");
+                }else{
+                    resultado.value = "Error";
+                    log("Error al registrar paciente");
                 }
             }else{
                 resultado.value = "Paciente_activo";
@@ -60,28 +81,6 @@ public class GestionPacienteImpl implements GestionPacientesOperations {
             resultado.value = "Limite_superado";
             log("No se pueden almacenar mas pacientes.");
         }
-        /*if(!pacienteRegistrado(objPaciente)){
-            
-                if(pacientes.add(objPaciente)){
-                    res = true;
-                    log("Paciente nuevo:");
-                    log("Nombre:"+objPaciente.getNombres()+" "+objPaciente.getApellidos());
-                    log("Identificacion: "+objPaciente.getTipo_id()+" "+objPaciente.getId());
-                    log("Direccion:"+objPaciente.getDireccion());
-                    log("Creando historial...");
-                    crearHistorialPaciente(objPaciente.getId());
-                    resultado.value = "registrado";
-                }else{
-                    resultado.value = "Error";
-                    log("Error al registrar paciente");
-                }
-            
-        }else{
-            resultado.value = "id_existente";
-            log("El  paciente con id "+objPaciente.getId()+" ya esta registrado");
-        }
-        log(resultado.value);*/
-        resultado.value = "";
         return res;
     }
     
@@ -96,17 +95,42 @@ public class GestionPacienteImpl implements GestionPacientesOperations {
 
     @Override
     public boolean actualizarPaciente(PacienteDTO objPaciente) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        log("Ejecutando actualizarPaciente...");
+        boolean res = false;
+        if(pacienteRegistrado(objPaciente)){
+            res = objPacienteDAO.actualizarPaciente(objPaciente);
+            log("Actualizando datos paciente con id"+objPaciente.id+":");
+            log("Nombre:"+objPaciente.nombres+" "+objPaciente.apellidos);
+            log("Identificacion: "+objPaciente.tipo_id+" "+objPaciente.id);
+            log("Direccion:"+objPaciente.direccion);
+        }else{
+            log("El paciente con id "+objPaciente.id+" no esta registrado se procedera a registrar sus datos");
+            res = objPacienteDAO.registrarPaciente(objPaciente);
+            log("Paciente nuevo:");
+            log("Nombre:"+objPaciente.nombres+" "+objPaciente.apellidos);
+            log("Identificacion: "+objPaciente.tipo_id+" "+objPaciente.id);
+            log("Direccion:"+objPaciente.direccion);
+        }
+        return res;
     }
 
     @Override
     public PacienteDTO buscarPaciente(int idPaciente) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        log("Ejecutando buscarPaciente...");
+        PacienteDTO objPaciente = objPacienteDAO.consultarPacienteId(idPaciente);
+        if(objPaciente!=null){
+            log("Paciente encontrado:");
+            log("Nombre:"+objPaciente.nombres+" "+objPaciente.apellidos);
+            log("Identificacion: "+objPaciente.tipo_id+" "+objPaciente.id);
+            log("Direccion:"+objPaciente.direccion);
+        }else{
+            log("No se encontro el paciente con id "+idPaciente);
+        }
+        return objPaciente;
     }
 
     @Override
     public boolean enviarIndicadores(int idPaciente, IndicadoresDTO objIndicadores) {
-        System.out.println("Hola");
         HistorialAlertasDTO objAlertasDTO = new HistorialAlertasDTO();
         objAlertasDTO.alertas = obtenenrHistorial();
         objAlertasDTO.objPaciente = new PacienteDTO();
@@ -127,18 +151,17 @@ public class GestionPacienteImpl implements GestionPacientesOperations {
 
     @Override
     public int getMaxPacientes() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+       return MAX_PACIENTES;
     }
 
     @Override
     public int getNumRegistros() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return objRegistros.size();
     }
 
     public void consultarReferenciaRemota(NamingContextExt nce, String servicio) {
         try {
             this.objRefRemotaNotificaciones = NotificacionesHelper.narrow(nce.resolve_str(servicio));
-
             System.out.println("Obteniendo el manejador sobre el servidor de objetos:" + this.objRefRemotaNotificaciones);
             guiAlertas.setVisible(true);
         } catch (NotFound ex) {
