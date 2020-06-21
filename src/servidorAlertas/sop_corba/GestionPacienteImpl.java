@@ -1,13 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package servidorAlertas.sop_corba;
 
 import cliente.sop_corba.Paciente;
-import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,7 +23,7 @@ import servidorNotificaciones.sop_corba.NotificacionesHelper;
  *
  * @author JhonMZ
  */
-public class GestionPacienteImpl implements GestionPacientesOperations{
+public class GestionPacienteImpl implements GestionPacientesOperations {
 
     private VistaLogAlertas guiAlertas;
     private Notificaciones objRefRemotaNotificaciones;
@@ -123,7 +116,13 @@ public class GestionPacienteImpl implements GestionPacientesOperations{
 
     @Override
     public boolean establecerMaxPacientes(int num) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        log("\nEjecutando establecerMaxPacientes...");
+        if(num>=1 && num<=5){
+            this.MAX_PACIENTES = num;
+            return true;
+        }else{
+        return false;
+        }
     }
 
     @Override
@@ -135,11 +134,13 @@ public class GestionPacienteImpl implements GestionPacientesOperations{
     public int getNumRegistros() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
-    public void consultarReferenciaRemota(NamingContextExt nce, String servicio){
+
+    public void consultarReferenciaRemota(NamingContextExt nce, String servicio) {
         try {
             this.objRefRemotaNotificaciones = NotificacionesHelper.narrow(nce.resolve_str(servicio));
-            System.out.println("Obteniendo el manejador sobre el servidor de objetos:"+this.objRefRemotaNotificaciones);
+
+            System.out.println("Obteniendo el manejador sobre el servidor de objetos:" + this.objRefRemotaNotificaciones);
+            guiAlertas.setVisible(true);
         } catch (NotFound ex) {
             Logger.getLogger(GestionPacienteImpl.class.getName()).log(Level.SEVERE, null, ex);
         } catch (CannotProceed ex) {
@@ -147,16 +148,16 @@ public class GestionPacienteImpl implements GestionPacientesOperations{
         } catch (InvalidName ex) {
             Logger.getLogger(GestionPacienteImpl.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
     }
-    
-    private AlertaDTO[] obtenenrHistorial(){
+
+    private AlertaDTO[] obtenenrHistorial() {
         AlertaDTO objHistorial[] = new AlertaDTO[6];
         System.out.print(objHistorial.length);
         for (int i = 0; i < objHistorial.length; i++) {
             objHistorial[i] = new AlertaDTO();
         }
-        
+
         return objHistorial;
     }
     
