@@ -12,14 +12,8 @@ public class ClienteDeObjetos {
     //*** Atributo estático ***
 
     static GestionPacientes ref;
-    static float temp = 0;
-    static boolean estable = true;
-    static boolean registro = false;
-    static int id;
-    static int cont = 0;//controla la cantida de pacientes
-    static int aux = 0;//controla la existencia de pacientes
 
-    public static void main(String args[]) {
+    public GestionPacientes principal() {
         try {
             String[] vec = new String[4];
             vec[0] = "-ORBInitialPort";
@@ -49,27 +43,9 @@ public class ClienteDeObjetos {
             System.out.println("ERROR : " + e);
             e.printStackTrace(System.out);
         }
+        return ref;
     }
+    
 
-    public static boolean opcion2() {
 
-        System.out.println(" Digite la temperatura del paciente: ");
-        temp = UtilidadesConsola.leerFlotante();
-        if (temp < 36.2 || temp > 38.2) {
-            estable = false;
-        }
-        return estable;
-    }
-
-    public static int menu() {
-
-        System.out.println(" :: MENU ::");
-        System.out.println(" :1: Registrar Asintomatico");
-        System.out.println(" :2: Enviar indicador");
-        System.out.println(" :3: Salir");
-        int rta = UtilidadesConsola.leerEntero();
-
-        return rta;
-
-    }
 }

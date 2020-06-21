@@ -3,10 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package servidorAlertas.sop_corba;
 
 import cliente.sop_corba.Paciente;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.omg.CORBA.StringHolder;
@@ -26,19 +26,42 @@ import servidorNotificaciones.sop_corba.NotificacionesHelper;
  *
  * @author JhonMZ
  */
-public class GestionPacienteImpl implements GestionPacientesOperations{
+public class GestionPacienteImpl implements GestionPacientesOperations {
 
     VistaLogAlertas guiAlertas;
     Notificaciones objRefRemotaNotificaciones;
+    ArrayList<PacienteDTO> lista;
+    int tam;
+
     public GestionPacienteImpl(VistaLogAlertas guiAlertas) {
         this.guiAlertas = guiAlertas;
-    }
-    
-    @Override
-    public boolean registrarPaciente(PacienteDTO objPaciente, Paciente refCliente, StringHolder resultado) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+
     }
 
+    @Override
+    public boolean registrarPaciente(PacienteDTO objPaciente, Paciente refCliente, StringHolder resultado) {
+
+        if(lista.size()==tam){
+            return false;
+        }else{
+            lista.add(objPaciente);
+            return true;
+        }
+    }
+
+    private boolean pacienteRegistrado(PacienteDTO objPaciente){
+        //System.out.println("Buscando paciente...");
+        boolean res = false;
+        if(objPaciente != null){
+            for (PacienteDTO pacienteDTO : lista) {
+                if(pacienteDTO.id == objPaciente.id){
+                    res = true;
+                    break;
+                }
+            }
+        }
+        return res;
+    }
     @Override
     public boolean actualizarPaciente(PacienteDTO objPaciente) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -61,7 +84,15 @@ public class GestionPacienteImpl implements GestionPacientesOperations{
 
     @Override
     public boolean establecerMaxPacientes(int num) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+
+        if (num < 0 || num > 5) {
+            return false;
+        } else {
+            this.lista = new ArrayList(num);
+            tam = num;
+            return true;
+        }
+
     }
 
     @Override
@@ -73,11 +104,11 @@ public class GestionPacienteImpl implements GestionPacientesOperations{
     public int getNumRegistros() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
-    public void consultarReferenciaRemota(NamingContextExt nce, String servicio){
+
+    public void consultarReferenciaRemota(NamingContextExt nce, String servicio) {
         try {
             this.objRefRemotaNotificaciones = NotificacionesHelper.narrow(nce.resolve_str(servicio));
-            System.out.println("Obteniendo el manejador sobre el servidor de objetos:"+this.objRefRemotaNotificaciones);
+            System.out.println("Obteniendo el manejador sobre el servidor de objetos:" + this.objRefRemotaNotificaciones);
             guiAlertas.setVisible(true);
         } catch (NotFound ex) {
             Logger.getLogger(GestionPacienteImpl.class.getName()).log(Level.SEVERE, null, ex);
@@ -86,16 +117,16 @@ public class GestionPacienteImpl implements GestionPacientesOperations{
         } catch (InvalidName ex) {
             Logger.getLogger(GestionPacienteImpl.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
     }
-    
-    private AlertaDTO[] obtenenrHistorial(){
+
+    private AlertaDTO[] obtenenrHistorial() {
         AlertaDTO objHistorial[] = new AlertaDTO[6];
         System.out.print(objHistorial.length);
         for (int i = 0; i < objHistorial.length; i++) {
             objHistorial[i] = new AlertaDTO();
         }
-        
+
         return objHistorial;
     }
 }
