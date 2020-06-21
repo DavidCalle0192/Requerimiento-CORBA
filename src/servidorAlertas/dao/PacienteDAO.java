@@ -38,7 +38,36 @@ public class PacienteDAO {
             sentencia.setString(4, objPaciente.apellidos);
             sentencia.setString(5, objPaciente.direccion);;
             
-            boolean res = sentencia.execute();
+            boolean res = sentencia.executeUpdate()>0;
+            sentencia.close();
+            objConex.desconectar();
+            
+            return res;
+        } catch (SQLException ex) {
+            Logger.getLogger(PacienteDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return false;
+    }
+    
+    public boolean actualizarPaciente(PacienteDTO objPaciente){
+        try {
+            objConex.conectar();
+            PreparedStatement sentencia = null;
+            String update = "UPDATE paciente SET paciente.tipo_id=?,"
+                                                +"paciente.nombre=?,"
+                                                +"paciente.apellido=?,"
+                                                +"paciente.direccion=?"
+                                                +"WHERE paciente.idPaciente = ?;";
+            System.out.print(objConex);
+            sentencia = objConex.getConnection().prepareStatement(update);
+            sentencia.setString(1, objPaciente.tipo_id);
+            sentencia.setString(2, objPaciente.nombres);
+            sentencia.setString(3, objPaciente.apellidos);
+            sentencia.setString(4, objPaciente.direccion);;
+            sentencia.setInt(5, objPaciente.id);
+            
+            boolean res = sentencia.executeUpdate()>0;
             sentencia.close();
             objConex.desconectar();
             
@@ -64,9 +93,9 @@ public class PacienteDAO {
                 objPaciente = new PacienteDTO();
                 objPaciente.id = idPaciente;
                 objPaciente.tipo_id = res.getString("tipo_id");
-                objPaciente.tipo_id = res.getString("nombre");
-                objPaciente.tipo_id = res.getString("apellido");
-                objPaciente.tipo_id = res.getString("direccion");
+                objPaciente.nombres = res.getString("nombre");
+                objPaciente.apellidos = res.getString("apellido");
+                objPaciente.direccion = res.getString("direccion");
             }
             sentencia.close();
             objConex.desconectar();
