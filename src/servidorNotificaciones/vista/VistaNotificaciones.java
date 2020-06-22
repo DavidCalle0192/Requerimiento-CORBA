@@ -65,6 +65,8 @@ public class VistaNotificaciones extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(jTable1);
 
+        setTitle("Servidor de notificaciones");
+
         jLabel1.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("Alerta generada");
@@ -293,25 +295,25 @@ public class VistaNotificaciones extends javax.swing.JFrame {
         lblHora.setText("Hora de alerta:"+objAlerta.hora);
         
         
-        /*DefaultTableModel modelInd = (DefaultTableModel)tblIndicadores.getModel();
+        DefaultTableModel modelInd = (DefaultTableModel)tblIndicadores.getModel();
         modelInd.setRowCount(0);
         
-        modelInd.addRow(new Object[]{"Frecuencia Cardiaca",objAlertaDTO.getIndicadores().getFrecuenciaCardiaca()});
-        modelInd.addRow(new Object[]{"Frecuencia Respiratoria",objAlertaDTO.getIndicadores().getFrecuenciaRespiratoria()});
-        modelInd.addRow(new Object[]{"Temperatura",objAlertaDTO.getIndicadores().getTemperatura()});
+        modelInd.addRow(new Object[]{"Frecuencia Cardiaca",objAlerta.indicadores.frecuenciaCardiaca});
+        modelInd.addRow(new Object[]{"Frecuencia Respiratoria",objAlerta.indicadores.frecuenciaRespiratoria});
+        modelInd.addRow(new Object[]{"Temperatura",objAlerta.indicadores.temperatura});
         
         
-        if(objAlertaDTO.getPuntuacion()==2)lblMensaje.setText("Se debe visitar al paciente");
-        if(objAlertaDTO.getPuntuacion()==3)lblMensaje.setText("Se debe remitir al paciente al hospital");
+        if(objAlerta.puntuacion==2)lblMensaje.setText("Se debe visitar al paciente");
+        if(objAlerta.puntuacion==3)lblMensaje.setText("Se debe remitir al paciente al hospital");
         
         DefaultTableModel modelHis = (DefaultTableModel)tblHistorial.getModel();
         modelHis.setRowCount(0);
-        Stack<HistorialDTO> historial = objAlertaDTO.getHistorial();
-        while(!historial.empty()){
-            HistorialDTO objHistorialTemp = historial.pop();
-            modelHis.addRow(new Object[]{objHistorialTemp.getFecha().toString(),objHistorialTemp.getHora().toString(),objHistorialTemp.getPuntuacion()+""});
+        for (int i = 1; i < objHistorial.alertas.length; i++) {
+            AlertaDTO objAlertaTemp = objHistorial.alertas[i];
+            if(objAlertaTemp!=null)
+                if(objAlertaTemp.puntuacion!=-1)
+                    modelHis.addRow(new Object[]{objAlertaTemp.fecha,objAlertaTemp.hora,objAlertaTemp.puntuacion+""});
         }
-        */
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
