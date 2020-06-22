@@ -6,8 +6,8 @@
 
 package servidorNotificaciones.vista;
 
-import java.util.Stack;
 import javax.swing.table.DefaultTableModel;
+import servidorAlertas.dto.AlertaDTO;
 import servidorAlertas.dto.HistorialAlertasDTO;
 import servidorAlertas.dto.PacienteDTO;
 
@@ -284,15 +284,16 @@ public class VistaNotificaciones extends javax.swing.JFrame {
     
     public void editarInfo(HistorialAlertasDTO objHistorial){
         
-        /*PacienteDTO objPaciente = objHistorial.objPaciente;
-        lblIdPaciente.setText("N° Id:"+objPaciente.getId());
-        lblNomApe.setText("Nombre y apellidos:"+objPaciente.getNombres()+" "+objPaciente.getApellidos());
-        lblDireccion.setText("Direccion:"+objPaciente.getDireccion());
-        lblFecha.setText("Fecha de alerta:"+objAlertaDTO.getFecha().toString());
-        lblHora.setText("Hora de alerta:"+objAlertaDTO.getHora().toString());
+        PacienteDTO objPaciente = objHistorial.objPaciente;
+        AlertaDTO objAlerta = objHistorial.alertas[0];
+        lblIdPaciente.setText("N° Id:"+objPaciente.id);
+        lblNomApe.setText("Nombre y apellidos:"+objPaciente.nombres+" "+objPaciente.apellidos);
+        lblDireccion.setText("Direccion:"+objPaciente.direccion);
+        lblFecha.setText("Fecha de alerta:"+objAlerta.fecha);
+        lblHora.setText("Hora de alerta:"+objAlerta.hora);
         
         
-        DefaultTableModel modelInd = (DefaultTableModel)tblIndicadores.getModel();
+        /*DefaultTableModel modelInd = (DefaultTableModel)tblIndicadores.getModel();
         modelInd.setRowCount(0);
         
         modelInd.addRow(new Object[]{"Frecuencia Cardiaca",objAlertaDTO.getIndicadores().getFrecuenciaCardiaca()});

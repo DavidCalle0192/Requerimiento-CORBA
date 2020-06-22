@@ -137,8 +137,7 @@ public class ServidorDeObjetos extends javax.swing.JFrame {
             
             System.out.println("4. Crea el objeto servant");
             
-            VistaNotificaciones guiNotificaciones = new VistaNotificaciones();
-            NotificacionesImpl ObjServant = new NotificacionesImpl(guiNotificaciones);
+            NotificacionesImpl ObjServant = new NotificacionesImpl();
             
             System.out.println("5. Crea el objeto tie y se registra una referencia al objeto servant mediante el contructor");
             NotificacionesPOATie objTIE= new NotificacionesPOATie(ObjServant);

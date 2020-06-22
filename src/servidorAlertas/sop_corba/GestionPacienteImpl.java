@@ -1,6 +1,8 @@
 package servidorAlertas.sop_corba;
 
 import cliente.sop_corba.Paciente;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Hashtable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -10,6 +12,7 @@ import org.omg.CosNaming.NamingContextExt;
 import org.omg.CosNaming.NamingContextPackage.CannotProceed;
 import org.omg.CosNaming.NamingContextPackage.InvalidName;
 import org.omg.CosNaming.NamingContextPackage.NotFound;
+import servidorAlertas.dao.AlertaDAO;
 import servidorAlertas.dao.PacienteDAO;
 import servidorAlertas.dto.AlertaDTO;
 import servidorAlertas.dto.HistorialAlertasDTO;
@@ -29,14 +32,15 @@ public class GestionPacienteImpl implements GestionPacientesOperations {
     private Notificaciones objRefRemotaNotificaciones;
     private Hashtable<Integer, Pair<PacienteDTO,Paciente>> objRegistros;
     private int MAX_PACIENTES = -1;
-    PacienteDAO objPacienteDAO;
+    private PacienteDAO objPacienteDAO;
+    private AlertaDAO objAlertaDAO;
     
     public GestionPacienteImpl() {
         objRegistros = new Hashtable<>();
         objPacienteDAO = new PacienteDAO();
+        objAlertaDAO = new AlertaDAO();
         this.guiAlertas = new VistaLogAlertas();
-        guiAlertas.setVisible(true);
-
+        this.guiAlertas.setVisible(true);
     }
     
     /**
@@ -56,6 +60,10 @@ public class GestionPacienteImpl implements GestionPacientesOperations {
             if(!pacienteActivo(objPaciente)){
                 if(!pacienteRegistrado(objPaciente)){
                     res = objPacienteDAO.registrarPaciente(objPaciente);
+                    log("Paciente nuevo:");
+                    log("Nombre:"+objPaciente.nombres+" "+objPaciente.apellidos);
+                    log("Identificacion: "+objPaciente.tipo_id+" "+objPaciente.id);
+                    log("Direccion:"+objPaciente.direccion);
                     resultado.value = "registrado";
                 }else{
                     resultado.value = "actualizado";
@@ -64,11 +72,6 @@ public class GestionPacienteImpl implements GestionPacientesOperations {
                 }
                 if(res==true){
                     objRegistros.put(objPaciente.id, new Pair<PacienteDTO,Paciente>(objPaciente,refCliente));
-                    log("Paciente nuevo:");
-                    log("Nombre:"+objPaciente.nombres+" "+objPaciente.apellidos);
-                    log("Identificacion: "+objPaciente.tipo_id+" "+objPaciente.id);
-                    log("Direccion:"+objPaciente.direccion);
-                    //refCliente.alertarPaciente("Hola");
                 }else{
                     resultado.value = "Error";
                     log("Error al registrar paciente");
@@ -92,7 +95,8 @@ public class GestionPacienteImpl implements GestionPacientesOperations {
     private boolean pacienteRegistrado(PacienteDTO objPacienteDTO){
         return objPacienteDAO.consultarPacienteId(objPacienteDTO.id) != null;
     }
-
+    
+    
     @Override
     public boolean actualizarPaciente(PacienteDTO objPaciente) {
         log("Ejecutando actualizarPaciente...");
@@ -129,14 +133,67 @@ public class GestionPacienteImpl implements GestionPacientesOperations {
         return objPaciente;
     }
 
+    
+    /**
+     * Evalua los indicadores del paciente dandoles una puntuacion, si los indicadores estan
+     * fuera de lo normal se retorna false 
+     * @param idPaciente identificacion del paciente
+     * @param objIndicadores objeto con la informacion de los indicadores
+     * @return Retorna true si los indicadores estan en un valor normal o false de lo contrario
+     */
     @Override
     public boolean enviarIndicadores(int idPaciente, IndicadoresDTO objIndicadores) {
-        HistorialAlertasDTO objAlertasDTO = new HistorialAlertasDTO();
-        objAlertasDTO.alertas = obtenenrHistorial();
-        objAlertasDTO.objPaciente = new PacienteDTO();
-        objRefRemotaNotificaciones.enviarAlerta(objAlertasDTO);
+        log("\nEjecutando enviarIndicadores...");
+        
+        int puntuacion = obtenerPuntuacion(objIndicadores);
+        log("Indicadores del paciente con id "+idPaciente);
+        log("FC:"+objIndicadores.frecuenciaCardiaca);
+        log("FR:"+objIndicadores.frecuenciaRespiratoria);
+        log("ToC:"+objIndicadores.temperatura);
+        log("Puntuacion:"+puntuacion);
+        
+        if(puntuacion>1){
+            log("Indicadores fuera de lo normal. Almacenando alerta y enviando alerta...");
+            
+            AlertaDTO objAlerta = new AlertaDTO(objIndicadores, LocalDate.now().toString(), LocalTime.now().toString(),puntuacion);
+            objAlertaDAO.registrarAlerta(idPaciente, objAlerta);
+            HistorialAlertasDTO objHistorial = obtenerHistorial(idPaciente);
+            objRefRemotaNotificaciones.enviarAlerta(objHistorial);
+            Pair<PacienteDTO,Paciente> objCliente = objRegistros.get(idPaciente);
+            objCliente.getValue().alertarPaciente("Paciente con indicadores fuera de lo normal");
+        }
         return true;
     }
+    
+    private HistorialAlertasDTO obtenerHistorial(int idPaciente) {
+        HistorialAlertasDTO objHistorial = new HistorialAlertasDTO();
+        objHistorial.objPaciente = buscarPaciente(idPaciente);
+        objHistorial.alertas  = objAlertaDAO.obtenerUltimas6Alertas(idPaciente);
+        
+        for (int i = 0; i < 6; i++) {
+            if(objHistorial.alertas[i]==null)
+                objHistorial.alertas[i] = new AlertaDTO(new IndicadoresDTO(), "", "", -1);
+        }
+
+        return objHistorial;
+    }
+    
+    private int obtenerPuntuacion(IndicadoresDTO objIndicadores){
+        int puntuacion = 0;
+        
+        if(objIndicadores != null){
+            if(objIndicadores.frecuenciaCardiaca < 60 
+                    || objIndicadores.frecuenciaCardiaca > 80)puntuacion++;
+
+            if(objIndicadores.frecuenciaRespiratoria < 70 
+                    || objIndicadores.frecuenciaRespiratoria > 90)puntuacion++;
+
+            if(objIndicadores.temperatura < 36.2 
+                    || objIndicadores.temperatura > 38.2)puntuacion++;
+        }
+        return puntuacion;
+       
+    }   
 
     @Override
     public boolean establecerMaxPacientes(int num) {
@@ -172,16 +229,6 @@ public class GestionPacienteImpl implements GestionPacientesOperations {
             Logger.getLogger(GestionPacienteImpl.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-    }
-
-    private AlertaDTO[] obtenenrHistorial() {
-        AlertaDTO objHistorial[] = new AlertaDTO[6];
-        System.out.print(objHistorial.length);
-        for (int i = 0; i < objHistorial.length; i++) {
-            objHistorial[i] = new AlertaDTO();
-        }
-
-        return objHistorial;
     }
     
     private void log(String log){

@@ -6,7 +6,9 @@
 
 package servidorNotificaciones.sop_corba;
 
+import servidorAlertas.dto.AlertaDTO;
 import servidorAlertas.dto.HistorialAlertasDTO;
+import servidorAlertas.dto.PacienteDTO;
 import servidorNotificaciones.vista.VistaNotificaciones;
 
 /**
@@ -17,16 +19,23 @@ public class NotificacionesImpl implements NotificacionesOperations{
     
     VistaNotificaciones guiNotificaciones;
     
-    public NotificacionesImpl(VistaNotificaciones guiNotificaciones) {
-        this.guiNotificaciones = guiNotificaciones;
+    public NotificacionesImpl() {
+        this.guiNotificaciones = new VistaNotificaciones();
+        this.guiNotificaciones.setVisible(true);
     }
 
     
     @Override
     public void enviarAlerta(HistorialAlertasDTO objHistorial) {
-        //guiNotificaciones.editarInfo(objHistorial);
-        System.out.println("Hola");
+        guiNotificaciones.editarInfo(objHistorial);
         guiNotificaciones.setVisible(true);
+        PacienteDTO objPaciente = objHistorial.objPaciente;
+        AlertaDTO objAlerta = objHistorial.alertas[0];
+        System.out.println("N° Id:"+objPaciente.id);
+        System.out.println("Nombre y apellidos:"+objPaciente.nombres+" "+objPaciente.apellidos);
+        System.out.println("Direccion:"+objPaciente.direccion);
+        System.out.println("Fecha de alerta:"+objAlerta.fecha);
+        System.out.println("Hora de alerta:"+objAlerta.hora);
     }
     
 }
