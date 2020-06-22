@@ -4,6 +4,8 @@ import cliente.sop_corba.Paciente;
 import cliente.sop_corba.PacienteHelper;
 import cliente.sop_corba.PacienteImpl;
 import cliente.utilidades.UtilidadesConsola;
+import java.util.Date;
+import java.util.Random;
 import org.omg.CORBA.*;
 import org.omg.CosNaming.*;
 import org.omg.CosNaming.NamingContextPackage.*;
@@ -18,15 +20,19 @@ public class ClienteDeObjetos {
     //*** Atributo estático ***
 
     static GestionPacientes ref;
-    public GestionPacientes principal() {
+    public static IndicadoresDTO inidicador;
+    static Paciente objcllbck;
+    static StringHolder resultado;
+    
+    public void principal(String ip, String puerto) {
         try {
             String[] vec = new String[4];
             vec[0] = "-ORBInitialPort";
-            System.out.println("Ingrese la dirección IP donde escucha el n_s");
-            vec[1] = UtilidadesConsola.leerCadena();
+            //System.out.println("Ingrese la dirección IP donde escucha el n_s");
+            vec[1] = ip; //UtilidadesConsola.leerCadena();
             vec[2] = "-ORBInitialPort";
             System.out.println("Ingrese el puerto donde escucha el n_s");
-            vec[3] = UtilidadesConsola.leerCadena();
+            vec[3] = puerto;//UtilidadesConsola.leerCadena();
 
             // se crea e inicia el ORB
             ORB orb = ORB.init(vec, null);
@@ -47,12 +53,44 @@ public class ClienteDeObjetos {
             rootpoa.the_POAManager().activate();
             org.omg.CORBA.Object refCliente = rootpoa.servant_to_reference(clienteCallbackImpl);
             // obtiene la referencia del objeto callback
-            Paciente objcllbck = PacienteHelper.narrow(refCliente);
-            StringHolder resultado = new StringHolder("");
+            objcllbck = PacienteHelper.narrow(refCliente);
+            Date objDate = new Date();
+            resultado = new StringHolder(objDate.toString());
         } catch (Exception e) {
             System.out.println("ERROR : " + e);
             e.printStackTrace(System.out);
         }
+        
+    }
+    public Paciente retornarServant(){
+        return  objcllbck;
+        
+    }
+    
+    public StringHolder retornarHolder(){
+    
+        return resultado;
+    }
+    
+    public GestionPacientes retornarObjGestionPaciente(){
         return ref;
+    }
+    
+    public IndicadoresDTO iniciarSeguimiento(int id) {
+            inidicador = new IndicadoresDTO(0,0,0,id);
+            
+                     Random fcr = new Random();
+                    inidicador.setFrecuenciaCardiaca((int) (50 + fcr.nextFloat() * (90 - 50)));
+                    //listaPaciente.get(i).setListaIndicadores(objIndicador);
+                    
+                    Random frr = new Random();
+                    inidicador.setFrecuenciaRespiratoria((int) (60 + frr.nextFloat() * (100 - 60)));
+                    //listaPaciente.get(i).setListaIndicadores(objIndicador);
+                    
+                    Random ter = new Random();
+                    inidicador.setTemperatura((float) (35.2 + ter.nextFloat() * (38.2 - 35.2)));
+                    //listaPaciente.get(i).setListaIndicadores(objIndicador);
+     
+                    return inidicador;
     }
 }

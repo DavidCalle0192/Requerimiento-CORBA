@@ -18,6 +18,7 @@ public final class IndicadoresDTO implements org.omg.CORBA.portable.IDLEntity
   {
   } // ctor
 
+  
   public IndicadoresDTO (int _frecuenciaCardiaca, int _frecuenciaRespiratoria, float _temperatura)
   {
     frecuenciaCardiaca = _frecuenciaCardiaca;
@@ -25,4 +26,33 @@ public final class IndicadoresDTO implements org.omg.CORBA.portable.IDLEntity
     temperatura = _temperatura;
   } // ctor
 
+    public IndicadoresDTO(int i, int i0, int i1, int id) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public int getFrecuenciaCardiaca() {
+        return frecuenciaCardiaca;
+    }
+
+    public void setFrecuenciaCardiaca(int frecuenciaCardiaca) {
+        this.frecuenciaCardiaca = frecuenciaCardiaca;
+    }
+
+    public int getFrecuenciaRespiratoria() {
+        return frecuenciaRespiratoria;
+    }
+
+    public void setFrecuenciaRespiratoria(int frecuenciaRespiratoria) {
+        this.frecuenciaRespiratoria = frecuenciaRespiratoria;
+    }
+
+    public float getTemperatura() {
+        return temperatura;
+    }
+
+    public void setTemperatura(float temperatura) {
+        this.temperatura = temperatura;
+    }
+
+    
 } // class IndicadoresDTO
