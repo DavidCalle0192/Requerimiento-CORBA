@@ -33,47 +33,51 @@ public class MenuMedico extends javax.swing.JFrame {
     //public static ClsHabitacion objHabitacion;
     public static int bandera = 0;
     public static String texto;
-    public static int aux=0;//controla la existencia de pacientes registrados 
+    public static int aux = 0;//controla la existencia de pacientes registrados 
     public static String enviarIndicadores;
     int rol;
     PacienteDTO objusuario;
-   
+
     /**
      * Creates new form MenuMedico
      */
-    public MenuMedico(ClienteDeObjetos co){
+    public MenuMedico(ClienteDeObjetos co) {
         this.co = co;
-        definirRol();
+        //definirRol();
         initComponents();
         btn_iniciarSeguimiento.setEnabled(false);
         btn_paraSeguimiento.setEnabled(false);
         btn_paraSeguimiento.setVisible(false);
-        
+
     }
-    
-    public void pasarUsuario(PacienteDTO objpacientedto){
-        objusuario=objpacientedto;
+
+    public void pasarUsuario(PacienteDTO objpacientedto) {
+        objusuario = objpacientedto;
     }
-    public void definirRol(){
-        if(co.retornarObjGestionPaciente().getNumRegistros()==0){
+
+    public void definirRol() {
+        if (co.obtenerObjGestionPaciente().getNumRegistros() == 0) {
             lb_menuMedico.setText("Menú administrador");
         }
     }
+
     public MenuMedico() {
         initComponents();
     }
 
-    public void cargarInfoUusuario(){
-        lb_nombre_apellido.setText("Nombre: "+objusuario.nombres+" "+objusuario.apellidos);
-        lb_tipo_id.setText("Tipo ID: "+objusuario.tipo_id);
-        lb_direccion.setText("Dirección: "+objusuario.direccion);
+    public void cargarInfoUusuario() {
+        lb_nombre_apellido.setText("Nombre: " + objusuario.nombres + " " + objusuario.apellidos);
+        lb_tipo_id.setText("Tipo ID: " + objusuario.tipo_id);
+        lb_direccion.setText("Dirección: " + objusuario.direccion);
     }
-    public void darVisibilidad(){
+
+    public void darVisibilidad() {
         btn_registrarPaciente.setEnabled(false);
         btn_registrarPaciente.setVisible(false);
         btn_iniciarSeguimiento.setEnabled(true);
-        
+
     }
+
     public void hilo() {
         enviarIndicadores = "";
         texto = "";
@@ -88,20 +92,20 @@ public class MenuMedico extends javax.swing.JFrame {
                 if (bandera == 1) {
                     timer.cancel();
                 } else {
-                   
-                        IndicadoresDTO indicador = co.iniciarSeguimiento(objusuario.id);
-                        co.retornarObjGestionPaciente().enviarIndicadores(objusuario.id, indicador);
-                        //ref.enviarIndicadores(objusuario.id, indicador);
-                            texto = texto
-                                    + "ID paciente: " + objusuario.id
-                                    + "\nFrecuencia cardiaca: " + indicador.getFrecuenciaCardiaca()
-                                    + "\nFrecuencia respiratoria: " + indicador.getFrecuenciaRespiratoria()
-                                    + "\nTemperatura: " + indicador.getTemperatura() 
-                                    + "\nRespuesta: "+enviarIndicadores
-                                    +"\n\n";
-                    }
-                    txtArea_seguimiento.setText(texto);
-          
+
+                    IndicadoresDTO indicador = co.iniciarSeguimiento(objusuario.id);
+                    co.obtenerObjGestionPaciente().enviarIndicadores(objusuario.id, indicador);
+                    //ref.enviarIndicadores(objusuario.id, indicador);
+                    texto = texto
+                            + "ID paciente: " + objusuario.id
+                            + "\nFrecuencia cardiaca: " + indicador.getFrecuenciaCardiaca()
+                            + "\nFrecuencia respiratoria: " + indicador.getFrecuenciaRespiratoria()
+                            + "\nTemperatura: " + indicador.getTemperatura()
+                            + "\nRespuesta: " + enviarIndicadores
+                            + "\n\n";
+                }
+                txtArea_seguimiento.setText(texto);
+
             }
 
         };
@@ -130,6 +134,9 @@ public class MenuMedico extends javax.swing.JFrame {
         txtArea_seguimiento = new javax.swing.JTextArea();
         btn_limpiar = new javax.swing.JButton();
         btn_salir = new javax.swing.JButton();
+        btn_buscar = new javax.swing.JButton();
+        btn_actualizar = new javax.swing.JButton();
+        txf_buscarOactualizar = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -220,22 +227,45 @@ public class MenuMedico extends javax.swing.JFrame {
             }
         });
 
+        btn_buscar.setText("Buscar");
+        btn_buscar.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        btn_buscar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_buscarActionPerformed(evt);
+            }
+        });
+
+        btn_actualizar.setText("Actualizar");
+        btn_actualizar.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        btn_actualizar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_actualizarActionPerformed(evt);
+            }
+        });
+
+        txf_buscarOactualizar.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(25, 25, 25)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(10, 10, 10)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 510, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(btn_salir, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(btn_limpiar, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                .addComponent(btn_limpiar, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jScrollPane1))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(btn_buscar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(txf_buscarOactualizar)
+                            .addComponent(btn_actualizar, javax.swing.GroupLayout.DEFAULT_SIZE, 83, Short.MAX_VALUE))))
                 .addContainerGap(26, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -244,7 +274,14 @@ public class MenuMedico extends javax.swing.JFrame {
                 .addGap(23, 23, 23)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 204, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 204, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btn_buscar, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(txf_buscarOactualizar, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btn_actualizar, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btn_salir, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -262,17 +299,17 @@ public class MenuMedico extends javax.swing.JFrame {
     }//GEN-LAST:event_btn_salirActionPerformed
 
     private void btn_registrarPacienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_registrarPacienteActionPerformed
-        
-        aux=1;
-        if (co.retornarObjGestionPaciente().getNumRegistros() == co.retornarObjGestionPaciente().getMaxPacientes()) {
+
+        aux = 1;
+        if (co.obtenerObjGestionPaciente().getNumRegistros() == co.obtenerObjGestionPaciente().getMaxPacientes()) {
             JOptionPane.showMessageDialog(null, "Limite de registros alcanzados");
         } else {
-            
-            RegistarPaciente rp = new RegistarPaciente(co);            
+
+            RegistarPaciente rp = new RegistarPaciente(co);
             rp.setVisible(true);
             this.setVisible(false);
         }
-       
+
     }//GEN-LAST:event_btn_registrarPacienteActionPerformed
 
     private void btn_paraSeguimientoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_paraSeguimientoActionPerformed
@@ -284,23 +321,81 @@ public class MenuMedico extends javax.swing.JFrame {
 
     private void btn_iniciarSeguimientoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_iniciarSeguimientoActionPerformed
         // TODO add your handling code here:
-        
-        if(aux == 0){
+
+        if (aux == 0) {
             JOptionPane.showMessageDialog(null, "No existen pacientes registrados.");
-        }else{
+        } else {
             btn_paraSeguimiento.setEnabled(true);
             btn_paraSeguimiento.setVisible(true);
             hilo();
         }
-        
+
     }//GEN-LAST:event_btn_iniciarSeguimientoActionPerformed
-/**/
+    /**/
     private void btn_limpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_limpiarActionPerformed
         // TODO add your handling code here:
-        bandera=1;
+        bandera = 1;
         txtArea_seguimiento.setText("");
-        
+
     }//GEN-LAST:event_btn_limpiarActionPerformed
+
+    public boolean esNumerico(String cadena) {
+
+        try {
+
+            if (cadena.matches("\\d*")) {
+                return true;
+            }
+        } catch (NumberFormatException e) {
+
+        }
+        return false;
+    }
+
+    public boolean validar() {
+        if (txf_buscarOactualizar.getText().equals("")) {
+            JOptionPane.showMessageDialog(null, "El campo se encuentra vacio");
+            return false;
+        } else if (!esNumerico(txf_buscarOactualizar.getText())) {
+            JOptionPane.showMessageDialog(null, "Ingrese un valor númerico");
+            txf_buscarOactualizar.setText("");
+            return false;
+        } else {
+            return true;
+        }
+    }
+    private void btn_buscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_buscarActionPerformed
+        // TODO add your handling code here:
+        if (validar()) {
+            int id = Integer.parseInt(txf_buscarOactualizar.getText());
+            txtArea_seguimiento.setText("");
+            objusuario = co.obtenerObjGestionPaciente().buscarPaciente(id);
+            String mostrar;
+            if (objusuario == null) {
+                mostrar = "Usuario no encontrado ";
+            } else {
+                mostrar
+                        = "ID: " + objusuario.id
+                        + "\nNombres: " + objusuario.nombres
+                        + "\nApellidos: " + objusuario.apellidos
+                        + "\nDirección: " + objusuario.direccion;
+            }
+            txtArea_seguimiento.setText(mostrar);
+        }
+    }//GEN-LAST:event_btn_buscarActionPerformed
+
+    private void btn_actualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_actualizarActionPerformed
+        // TODO add your handling code here:
+        if(validar()){
+            int id = Integer.parseInt(txf_buscarOactualizar.getText());
+            RegistarPaciente vista = new RegistarPaciente(co);
+            objusuario= co.obtenerObjGestionPaciente().buscarPaciente(id);
+            vista.infoActualizar(objusuario);
+            vista.cambiarEtiqueta();
+            vista.setVisible(true);
+            this.setVisible(false);
+        }
+    }//GEN-LAST:event_btn_actualizarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -333,18 +428,20 @@ public class MenuMedico extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new MenuMedico().setVisible(true);
-                
+
             }
         });
     }
-    
-    public void mostraMensajeAlerta(String mensaje){
+
+    public void mostraMensajeAlerta(String mensaje) {
         System.err.println(mensaje);
         //lblMensaje.setText(mensaje);
         JOptionPane.showMessageDialog(null, mensaje);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btn_actualizar;
+    private javax.swing.JButton btn_buscar;
     private javax.swing.JButton btn_iniciarSeguimiento;
     private javax.swing.JButton btn_limpiar;
     private javax.swing.JButton btn_paraSeguimiento;
@@ -356,6 +453,7 @@ public class MenuMedico extends javax.swing.JFrame {
     private javax.swing.JLabel lb_menuMedico;
     private javax.swing.JLabel lb_nombre_apellido;
     private javax.swing.JLabel lb_tipo_id;
+    private javax.swing.JTextField txf_buscarOactualizar;
     private javax.swing.JTextArea txtArea_seguimiento;
     // End of variables declaration//GEN-END:variables
 }
