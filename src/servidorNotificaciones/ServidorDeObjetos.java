@@ -159,7 +159,7 @@ public class ServidorDeObjetos extends javax.swing.JFrame {
             refContextoNombrado.rebind(path, referenciaORB);
             this.setVisible(false);
             System.out.println("El Servidor esta listo y esperando ...");
-            orb.run();
+            //orb.run();
         }catch (Exception e){
             
         }
