@@ -6,13 +6,25 @@
 package clienteHabitacion;
 
 import cliente.ClienteDeObjetos;
+import cliente.sop_corba.Paciente;
+import cliente.sop_corba.PacienteHelper;
+import cliente.sop_corba.PacienteImpl;
 import cliente.vistas.MenuMedico;
 import cliente.vistas.vista1_administrador;
 import java.rmi.RemoteException;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import org.omg.CORBA.ORB;
+import org.omg.CORBA.StringHolder;
+import org.omg.CosNaming.NamingContextExt;
+import org.omg.CosNaming.NamingContextExtHelper;
+import org.omg.PortableServer.POA;
+import org.omg.PortableServer.POAHelper;
+import servidorAlertas.dto.IndicadoresDTO;
 import servidorAlertas.sop_corba.GestionPacientes;
+import servidorAlertas.sop_corba.GestionPacientesHelper;
 
 /**
  *
@@ -21,6 +33,11 @@ import servidorAlertas.sop_corba.GestionPacientes;
 public class ClienteHabitacion extends javax.swing.JFrame {
 
     public static ClienteDeObjetos co;
+    
+    static GestionPacientes ref;
+    public static IndicadoresDTO inidicador;
+    static Paciente objcllbck;
+    static StringHolder resultado;
 
     /**
      * Creates new form IniciarSesion
@@ -141,10 +158,52 @@ public class ClienteHabitacion extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void Button_establecer_conexionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Button_establecer_conexionActionPerformed
+/*
+        try {
+
+            String[] vec = new String[4];
+            vec[0] = "-ORBInitialPort";
+            
+            //System.out.println("Ingrese la dirección IP donde escucha el n_s");
+            vec[1] = TextField_direccion_ip.getText(); //UtilidadesConsola.leerCadena();
+            vec[2] = "-ORBInitialPort";
+
+            //System.out.println("Ingrese el puerto donde escucha el n_s");
+            vec[3] = TextField_puerto.getText();//UtilidadesConsola.leerCadena();
+
+            // se crea e inicia el ORB
+            ORB orb = ORB.init(vec, null);
+            System.out.println("entrada1");
+            // se obtiene la referencia al name service
+            org.omg.CORBA.Object objRef = orb.resolve_initial_references("NameService");
+            System.out.println("entrada2");
+            NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
+
+            // *** Resuelve la referencia del objeto en el N_S ***
+            String name = "objAlertas";
+            ref = GestionPacientesHelper.narrow(ncRef.resolve_str(name));
+            System.out.println("entrada3");
+            System.out.println("Obtenido el manejador sobre el servidor de objetos: " + ref);
+
+            PacienteImpl clienteCallbackImpl = new PacienteImpl();
+            // obtiene la referencia del rootpoa & activa el POAManager
+            POA rootpoa = POAHelper.narrow(orb.resolve_initial_references("RootPOA"));
+            rootpoa.the_POAManager().activate();
+            org.omg.CORBA.Object refCliente = rootpoa.servant_to_reference(clienteCallbackImpl);
+            // obtiene la referencia del objeto callback
+            objcllbck = PacienteHelper.narrow(refCliente);
+            Date objDate = new Date();
+            resultado = new StringHolder(objDate.toString());
+            System.out.println("entrada4");
+        } catch (Exception e) {
+            System.out.println("ERROR : " + e);
+            e.printStackTrace(System.out);
+        }*/
+        
         co = new ClienteDeObjetos();
         co.principal(TextField_direccion_ip.getText(), TextField_puerto.getText());
-        co.retornarObjGestionPaciente();
-        int tamArray = co.retornarObjGestionPaciente().getNumRegistros();//objRemoto.getMaxPacientes();
+        co.obtenerObjGestionPaciente();
+        int tamArray = co.obtenerObjGestionPaciente().getNumRegistros();//objRemoto.getMaxPacientes();
         if(tamArray==0){
             vista1_administrador v1 = new vista1_administrador(co);
             v1.setVisible(true);

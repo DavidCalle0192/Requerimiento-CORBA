@@ -120,7 +120,7 @@ public class vista1_administrador extends javax.swing.JFrame {
                     txf_numMaxReg.setText("");
                 } else {
                     //this.dispose();
-                    co.retornarObjGestionPaciente().establecerMaxPacientes(cantRegistros);
+                    co.obtenerObjGestionPaciente().establecerMaxPacientes(cantRegistros);
                     MenuMedico ma=new MenuMedico(co);
                     ma.definirRol();
                     ma.setVisible(true);

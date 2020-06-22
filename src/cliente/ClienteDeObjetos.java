@@ -26,21 +26,26 @@ public class ClienteDeObjetos {
     
     public void principal(String ip, String puerto) {
         try {
+        
             String[] vec = new String[4];
             vec[0] = "-ORBInitialPort";
+          
             //System.out.println("Ingrese la dirección IP donde escucha el n_s");
             vec[1] = ip; //UtilidadesConsola.leerCadena();
             vec[2] = "-ORBInitialPort";
-            System.out.println("Ingrese el puerto donde escucha el n_s");
+            
+            //System.out.println("Ingrese el puerto donde escucha el n_s");
             vec[3] = puerto;//UtilidadesConsola.leerCadena();
+          
 
             // se crea e inicia el ORB
             ORB orb = ORB.init(vec, null);
 
             // se obtiene la referencia al name service
             org.omg.CORBA.Object objRef = orb.resolve_initial_references("NameService");
+        
             NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
-
+        
             // *** Resuelve la referencia del objeto en el N_S ***
             String name = "objAlertas";
             ref = GestionPacientesHelper.narrow(ncRef.resolve_str(name));
@@ -55,24 +60,25 @@ public class ClienteDeObjetos {
             // obtiene la referencia del objeto callback
             objcllbck = PacienteHelper.narrow(refCliente);
             Date objDate = new Date();
-            resultado = new StringHolder(objDate.toString());
+            resultado = new StringHolder("");
         } catch (Exception e) {
             System.out.println("ERROR : " + e);
             e.printStackTrace(System.out);
         }
         
     }
-    public Paciente retornarServant(){
+ 
+    public Paciente obtenerServant(){
         return  objcllbck;
         
     }
     
-    public StringHolder retornarHolder(){
+    public StringHolder obtenerStringHolder(){
     
         return resultado;
     }
     
-    public GestionPacientes retornarObjGestionPaciente(){
+    public GestionPacientes obtenerObjGestionPaciente(){
         return ref;
     }
     

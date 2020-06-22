@@ -20,6 +20,7 @@ import org.omg.CORBA.StringHolder;
 import servidorAlertas.dto.PacienteDTO;
 import servidorAlertas.dto.PacienteDTOHolder;
 import servidorAlertas.sop_corba.GestionPacientes;
+import servidorAlertas.sop_corba.GestionPacientesHelper;
 //import servidorAlertas.dto.UsuarioDTO;
 //import servidorAlertas.sop_rmi.GestionPacienteInt;
 
@@ -30,12 +31,7 @@ import servidorAlertas.sop_corba.GestionPacientes;
 public class RegistarPaciente extends javax.swing.JFrame {
 
     public static ClienteDeObjetos co;
-
-    //public static ClienteDeObjetos cm;
-    //public static HabitacionInt objHabitacion;
-    //public static MenuMedico guiMenuMedico;
-    int rol = 1;//1-->admin 0-->medico
-    // public static UsuarioDTO objUsuario;
+    String etiqueta;
 
     /**
      * Creates new form prueba
@@ -47,12 +43,33 @@ public class RegistarPaciente extends javax.swing.JFrame {
         //this.guiMenuMedico = guiMenuMedico;
         initComponents();
         rbtn_cc.setSelected(true);
+        etiqueta = btn_crear.getText();
     }
 
-    public boolean verificar(int n, String nombres, String apellidos, String direccion) {
-        //String id = txf_id.getText();//Validar tipo de dato
+    public void cambiarEtiqueta() {
+        btn_crear.setText("Actualizar");
+    }
 
-        if (n == -1 || nombres.equals("") || apellidos.equals("") || direccion.equals("")) {
+    public void infoActualizar(PacienteDTO pacienteDTO) {
+        txf_id.setText("" + pacienteDTO.id);
+        txf_id.setEditable(false);
+        txf_nombres.setText(pacienteDTO.nombres);
+        txf_apellidos.setText(pacienteDTO.apellidos);
+        txf_direccion.setText(pacienteDTO.direccion);
+
+        String tipo = pacienteDTO.tipo_id;
+        if (tipo.equals("CC")) {
+            rbtn_cc.setSelected(true);
+        } else if (tipo.equals("TI")) {
+            rbtn_ti.setSelected(true);
+        } else {
+            rbtn_pp.setSelected(true);
+        }
+    }
+
+    public boolean verificar(String nombres, String apellidos, String direccion) {
+        //String id = txf_id.getText();//Validar tipo de dato
+        if (nombres.equals("") || apellidos.equals("") || direccion.equals("")) {
             return false;
         } else {
             return true;
@@ -191,21 +208,39 @@ public class RegistarPaciente extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btn_crearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_crearActionPerformed
-
-        // TODO add your handling code here:
-        int id;
-        if (!txf_id.getText().equals("")) {
-            id = Integer.parseInt(txf_id.getText());
-            if (id < 0) {
-                JOptionPane.showMessageDialog(null, "Por favor ingrese un numero positivo.");
-                id = -1;
-            }
+    public boolean validarID() {
+        if (txf_id.getText().equals("")) {
+            JOptionPane.showMessageDialog(null, "El campo se encuentra vacio");
+            return false;
+        } else if (!esNumerico(txf_id.getText())) {
+            JOptionPane.showMessageDialog(null, "Ingrese un valor númerico");
+            txf_id.setText("");
+            return false;
+        } else if (Integer.parseInt(txf_id.getText()) < 0) {
+            JOptionPane.showMessageDialog(null, "Ingrese un valor positivo");
+            txf_id.setText("");
+            return false;
         } else {
-            id = -1;//Con el valor de -1 se especifica al sistema que el campo esta vacio
+            return true;
+        }
+    }
+
+    public boolean esNumerico(String cadena) {
+
+        try {
+
+            if (cadena.matches("\\d*")) {
+                return true;
+            }
+        } catch (NumberFormatException e) {
 
         }
-        //String tipoId = txf_tipoId.getText();
+        return false;
+    }
+
+    private void btn_crearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_crearActionPerformed
+
+        PacienteDTO paciente = null;
         String tipoId = " ";
         if (rbtn_cc.isSelected()) {
             tipoId = "CC";
@@ -216,28 +251,53 @@ public class RegistarPaciente extends javax.swing.JFrame {
         if (rbtn_pp.isSelected()) {
             tipoId = "PP";
         }
-        //lb_menajeTipoId.setText(mensaje+tipoId);
         String nombres = txf_nombres.getText();
         String apellidos = txf_apellidos.getText();
         String direccion = txf_direccion.getText();
-        if (!verificar(id, nombres, apellidos, direccion)) {
+        if (!verificar(nombres, apellidos, direccion)) {
             JOptionPane.showMessageDialog(null, "Por favor diligenciar todos los campos");
 
-        } else {
-            PacienteDTO paciente = new PacienteDTO(nombres, apellidos, tipoId, id, direccion);
-            co.retornarObjGestionPaciente().registrarPaciente(
-                    paciente,
-                    co.retornarServant(),
-                    co.retornarHolder()
-            );
-
-            MenuMedico vista = new MenuMedico(co);
-            vista.pasarUsuario(paciente);
-            vista.darVisibilidad();
-            vista.cargarInfoUusuario();
-            vista.setVisible(true);
-            this.setVisible(false);
+        } else {//si estan llenos los campo
+            if (btn_crear.getText().equals("Crear")) {
+                int id;
+                if (validarID()) {
+                    id = Integer.parseInt(txf_id.getText());
+                    paciente = new PacienteDTO(nombres, apellidos, tipoId, id, direccion);
+                    boolean rta = co.obtenerObjGestionPaciente().registrarPaciente(//Se crea/registra paciente
+                            paciente,
+                            co.obtenerServant(),//referencia ¿averguar como se optiene?
+                            co.obtenerStringHolder()
+                    );
+                    if (rta) {
+                        JOptionPane.showMessageDialog(null, "Paciente creado con exito");
+                        MenuMedico vista = new MenuMedico(co);
+                        vista.pasarUsuario(paciente);
+                        vista.darVisibilidad();
+                        vista.cargarInfoUusuario();
+                        vista.setVisible(true);
+                        this.setVisible(false);
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Ha ocurrido un error al crear el paciente");
+                    }
+                }
+            } else {//se va a actualizar
+                int id = Integer.parseInt(txf_id.getText());
+                paciente = new PacienteDTO(nombres, apellidos, tipoId, id, direccion);
+                boolean res = co.obtenerObjGestionPaciente().actualizarPaciente(paciente);
+                if (res) {
+                    JOptionPane.showMessageDialog(null, "Paciente acualizado con éxito");
+                    MenuMedico vista = new MenuMedico(co);
+                    vista.pasarUsuario(paciente);
+                    vista.darVisibilidad();
+                    vista.cargarInfoUusuario();
+                    vista.setVisible(true);
+                    this.setVisible(false);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Ha ocurrido un error en la actualización");
+                }
+            }
         }
+
     }//GEN-LAST:event_btn_crearActionPerformed
 
     private void bnt_volverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bnt_volverActionPerformed
